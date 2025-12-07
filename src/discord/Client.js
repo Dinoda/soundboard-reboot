@@ -1,11 +1,8 @@
 import { Client, GatewayIntentBits, Events, REST, Routes } from 'discord.js';
 
-export const clientList = [];
+import { UserCommandError } from './error/ClientError.js';
 
-const DEFAULT_INTENTS = [
-	'Guilds',
-	'GuildVoiceStates',
-];
+export const clientList = [];
 
 const STATUS_FAILURE = -2;
 const STATUS_DESTROYED = -1;
@@ -24,11 +21,6 @@ export default class DiscordClient {
 		"Guilds"
 	];
 
-	static VOICE_INTENTS = [
-		"Guilds",
-		"GuildVoiceStates",
-	];
-
 	constructor(token, clientId, intents = Client.DEFAULT_INTENTS) {
 		this.token = token;
 		this.id = clientId;
@@ -41,7 +33,7 @@ export default class DiscordClient {
 		this.commandList = [];
 		this.commands = {};
 
-		this.client.on('InteractionCreate', (interaction) => {
+		this.client.on(Events.InteractionCreate, (interaction) => {
 			this.interact(interaction);
 		});
 
@@ -85,13 +77,14 @@ export default class DiscordClient {
 			for (const restcmd of cmd.restCall()) {
 				list.push(restcmd);
 			}
+			return list;
 		}, []);
 
 		await rest.put(Routes.applicationCommands(this.id), {
 			body,
 		});
 
-		console.log(`Pushed all commands to Discord`);
+		console.log(`Pushed all commands (${body.length} commands) to Discord`);
 	}
 
 	// Lifecycle Management //
@@ -127,15 +120,24 @@ export default class DiscordClient {
 	// ====================== //
 
 	async interact(interaction) {
-		if (interact.isChatInputCommand()) {
+		if (interaction.isChatInputCommand()) {
 			const cmd = this.commands[interaction.commandName];
 
 			console.log(`Received command: "${cmd.name}"`);
 
-			await this.callCommand(cmd, interaction);
+			try {
+				await this.callCommand(cmd, interaction);
 
-			if (interaction && ! interaction.replied) {
-				await interaction.reply(`Command executed without reply`);
+				if (interaction && ! interaction.replied) {
+					await interaction.reply(`Command executed without reply`);
+				}
+			} catch (err) {
+				if (err instanceof UserCommandError) {
+					await interaction.reply(err.message);
+					console.error('User command error:', err);
+				} else {
+					throw err;
+				}
 			}
 		}
 	}

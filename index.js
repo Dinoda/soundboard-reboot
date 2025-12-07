@@ -12,5 +12,6 @@ killOnSignal('uncaughtException');
 const client = new VoiceClient(process.env.DISCORD_TOKEN, process.env.DISCORD_CLIENT_ID);
 
 client.addCommand(joinCommand);
+client.addCommand(randomCommand);
 
 client.start();

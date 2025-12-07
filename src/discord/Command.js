@@ -44,7 +44,6 @@ export default class Command {
 	}
 
 	addStringOption(name, description, options = {}) {
-		console.log(this);
 		this.__addStringOption(this.command, name, description, options);
 
 		if (this.shortCommand) {
@@ -53,7 +52,6 @@ export default class Command {
 	}
 
 	__addStringOption(cmd, name, description, options) {
-		console.log(cmd);
 		cmd.addStringOption(opt => {
 			opt.setName(name)
 				.setDescription(description)

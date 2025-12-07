@@ -4,4 +4,4 @@
 .env.stage
 
 node_modules/*
-
+sounds
