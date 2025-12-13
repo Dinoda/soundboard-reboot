@@ -1,5 +1,7 @@
 import { diceCoefficient } from 'dice-coefficient';
 
+import resources from '../../audio/resources.js';
+import { randomLogReverse } from './random.js';
 
 class Proximity {
 	constructor(str) {
@@ -14,7 +16,7 @@ class Proximity {
 		this.values.push({ coeff, data });
 
 		if (coeff > this.best) {
-			this.best = ceoff;
+			this.best = coeff;
 		}
 	}
 
@@ -47,8 +49,9 @@ export default (str, resources) => {
 	if (! proximities[str]) {
 		const p = new Proximity(str);
 
-		for (const idx of resources) {
-			p.add(resources[idx].name, resources[idx]);
+		for (const res of resources) {
+			console.log(res);
+			p.add(res.name, res);
 		}
 
 		p.lastStep();
