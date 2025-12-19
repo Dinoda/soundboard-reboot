@@ -43,6 +43,8 @@ export default class VoiceDiscordClient extends DiscordClient {
 		if (vc && channel.members && channel.members.size == 1) {
 			vc.destroy();
 			this.audioPlayers[id].stop();
+			delete this.voiceChannels[id];
+			delete this.audioPlayers[id];
 		}
 	}
 
